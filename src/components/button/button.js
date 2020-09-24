@@ -18,6 +18,7 @@ const Button = ({
   secondary = false,
   small = false,
   block = false,
+  disabled = false,
   children,
   ...props
 }) => {
@@ -25,6 +26,7 @@ const Button = ({
 
   return (
     <button
+      disabled={disabled}
       className={cn(styles.button, {
         [styles.primary]: primary,
         [styles.secondary]: secondary,

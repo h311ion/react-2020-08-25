@@ -9,11 +9,24 @@ import './basket.css';
 import BasketRow from './basket-row';
 import BasketItem from './basket-item';
 import Button from '../button';
-import { orderProductsSelector, totalSelector } from '../../redux/selectors';
+import {
+  orderProductsSelector,
+  totalSelector,
+  orderLoadingSelector,
+} from '../../redux/selectors';
 import { UserConsumer } from '../../contexts/user';
+import { sendBasket } from '../../redux/actions';
+import Loader from '../loader';
 
-function Basket({ title = 'Basket', total, orderProducts }) {
-  // console.log('render Basket');
+function Basket({
+  title = 'Basket',
+  sendBasket,
+  match,
+  total,
+  orderProducts,
+  orderLoadingSelector,
+}) {
+  const isOnCheckoutPage = Boolean(match && match.isExact);
 
   // const { name } = useContext(userContext);
 
@@ -24,6 +37,9 @@ function Basket({ title = 'Basket', total, orderProducts }) {
       </div>
     );
   }
+
+  const checkoutFunction = isOnCheckoutPage ? sendBasket : null;
+  const buttonText = isOnCheckoutPage ? 'Place order' : 'Proceed to checkout';
 
   return (
     <div className={styles.basket}>
@@ -52,8 +68,13 @@ function Basket({ title = 'Basket', total, orderProducts }) {
       <BasketRow label="Delivery costs:" content="FREE" />
       <BasketRow label="total" content={`${total} $`} bold />
       <Link to="/checkout">
-        <Button primary block>
-          checkout
+        <Button
+          primary
+          block
+          onClick={checkoutFunction}
+          disabled={orderLoadingSelector}
+        >
+          {orderLoadingSelector ? <Loader /> : buttonText}
         </Button>
       </Link>
     </div>
@@ -64,5 +85,7 @@ export default connect(
   createStructuredSelector({
     total: totalSelector,
     orderProducts: orderProductsSelector,
-  })
+    orderLoadingSelector,
+  }),
+  { sendBasket }
 )(Basket);

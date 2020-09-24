@@ -6,7 +6,8 @@ const productsSelector = (state) => state.products.entities;
 const reviewsSelector = (state) => state.reviews.entities;
 const usersSelector = (state) => state.users.entities;
 
-const orderSelector = (state) => state.order;
+const orderSelector = (state) => state.order.entities;
+export const orderLoadingSelector = (state) => state.order.loading;
 
 export const restaurantsLoadingSelector = (state) => state.restaurants.loading;
 export const restaurantsLoadedSelector = (state) => state.restaurants.loaded;
@@ -75,6 +76,16 @@ export const orderProductsSelector = createSelector(
         restaurantId: restaurantsIds[product.id],
       }));
   }
+);
+
+export const basketSelector = createSelector(orderProductsSelector, (orders) =>
+  Object.keys(orders).reduce((acc, orderId) => {
+    const {
+      product: { id },
+      amount,
+    } = orders[orderId];
+    return [...acc, { id, amount }];
+  }, [])
 );
 
 export const totalSelector = createSelector(

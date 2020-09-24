@@ -12,12 +12,16 @@ import {
   REQUEST,
   SUCCESS,
   FAILURE,
+  SEND_BASKET,
+  CLEAR_BASKET,
 } from './constants';
 import {
   usersLoadingSelector,
   usersLoadedSelector,
   reviewsLoadingSelector,
   reviewsLoadedSelector,
+  basketSelector,
+  orderLoadingSelector,
 } from './selectors';
 
 export const increment = (id) => ({ type: INCREMENT, payload: { id } });
@@ -67,4 +71,37 @@ export const loadUsers = (restaurantId) => async (dispatch, getState) => {
   if (loading || loaded) return;
 
   dispatch({ type: LOAD_USERS, CallAPI: '/api/users' });
+};
+
+export const sendBasket = () => async (dispatch, getState) => {
+  const state = getState();
+  const loading = orderLoadingSelector(state);
+
+  if (loading) return;
+
+  const postData = {
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify(basketSelector(state)),
+    method: 'POST',
+  };
+
+  dispatch({ type: SEND_BASKET + REQUEST });
+  try {
+    const resp = await fetch('/api/order', postData);
+    const ok = resp.ok;
+    const response = await resp.json();
+
+    if (!ok) {
+      dispatch({ type: SEND_BASKET + FAILURE, error: response });
+      dispatch(replace('/error', { error: response }));
+      return;
+    }
+
+    dispatch({ type: SEND_BASKET + SUCCESS, response });
+    dispatch({ type: CLEAR_BASKET });
+    dispatch(replace('/success'));
+  } catch (error) {
+    dispatch({ type: SEND_BASKET + FAILURE, error });
+    dispatch(replace('/error', { error }));
+  }
 };
