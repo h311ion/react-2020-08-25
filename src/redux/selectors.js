@@ -12,6 +12,10 @@ export const orderLoadingSelector = (state) => state.order.loading;
 export const restaurantsLoadingSelector = (state) => state.restaurants.loading;
 export const restaurantsLoadedSelector = (state) => state.restaurants.loaded;
 
+export const currencyListSelector = (state) => state.currency.entities;
+export const currencySelector = (state) =>
+  state.currency.entities[state.currency.selectedId];
+
 export const productsLoadingSelector = (state, props) =>
   state.products.loading[props.restaurantId];
 export const productsLoadedSelector = (state, props) =>

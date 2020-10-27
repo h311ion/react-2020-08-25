@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
@@ -17,6 +17,7 @@ import {
 import { UserConsumer } from '../../contexts/user';
 import { sendBasket } from '../../redux/actions';
 import Loader from '../loader';
+import { currencyContext } from '../../contexts/currency';
 
 function Basket({
   title = 'Basket',
@@ -29,6 +30,8 @@ function Basket({
   const isOnCheckoutPage = Boolean(match && match.isExact);
 
   // const { name } = useContext(userContext);
+  const { currency } = useContext(currencyContext);
+  const { sign } = currency;
 
   if (!total) {
     return (
@@ -64,9 +67,9 @@ function Basket({
         ))}
       </TransitionGroup>
       <hr className={styles.hr} />
-      <BasketRow label="Sub-total" content={`${total} $`} />
+      <BasketRow label="Sub-total" content={`${total} ${sign}`} />
       <BasketRow label="Delivery costs:" content="FREE" />
-      <BasketRow label="total" content={`${total} $`} bold />
+      <BasketRow label="total" content={`${total} ${sign}`} bold />
       <Link to="/checkout">
         <Button
           primary
